@@ -4,6 +4,9 @@ Cockpit de gestion d'usine construit avec Django, templates, HTMX et Tailwind CS
 
 ## Démarrage avec uv
 
+Le projet conserve Python `>=3.11` comme compatibilité minimale et utilise Python
+3.12 par défaut, notamment pour les builds Vercel.
+
 ```powershell
 uv sync
 Copy-Item .env.example .env

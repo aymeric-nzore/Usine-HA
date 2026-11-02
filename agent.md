@@ -69,6 +69,9 @@ utile sur tablette pour les équipes terrain.
   WhiteNoise, collecte statique, hôtes Vercel et origines CSRF sont configurés.
   Les variables `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`,
   `CSRF_TRUSTED_ORIGINS` et `VERCEL_URL` restent à renseigner dans Vercel.
+- Le build Vercel utilise désormais Python 3.12 par défaut via `.python-version`,
+  car l’image Vercel ne fournit pas l’interpréteur Python 3.11 demandé par
+  l’environnement local. La compatibilité minimale déclarée reste Python 3.11.
 - La création admin d’un utilisateur demande désormais le rôle et l’atelier
   d’appartenance. L’équipe est obligatoire pour les opérateurs mais facultative pour
   un collaborateur responsable, afin d’éviter la boucle de création. Le profil
