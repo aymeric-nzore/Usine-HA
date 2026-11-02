@@ -62,6 +62,13 @@ utile sur tablette pour les équipes terrain.
 - La création d’utilisateur dans l’administration fonctionne avec le formulaire Django
   natif ; la personnalisation du champ de rôle est conditionnée à sa présence et
   l’atelier est proposé via l’inline `UserProfile`.
+- Le responsive du cockpit couvre désormais les écrans mobiles et tablettes : le menu
+  hamburger ouvre la navigation latérale, les tableaux restent consultables par
+  défilement horizontal et les formulaires évitent le zoom automatique sur iOS.
+- La préparation Vercel/Supabase est validée : `api/index.py`, `vercel.json`,
+  WhiteNoise, collecte statique, hôtes Vercel et origines CSRF sont configurés.
+  Les variables `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`,
+  `CSRF_TRUSTED_ORIGINS` et `VERCEL_URL` restent à renseigner dans Vercel.
 - La création admin d’un utilisateur demande désormais le rôle et l’atelier
   d’appartenance. L’équipe est obligatoire pour les opérateurs mais facultative pour
   un collaborateur responsable, afin d’éviter la boucle de création. Le profil
