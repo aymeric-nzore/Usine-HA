@@ -1,0 +1,5 @@
+<div class="incident-list">
+{% for incident in incidents %}
+  <div class="incident-row"><span class="incident-icon status-{{ incident.statut }}"><i class="fa-solid fa-{{ incident.statut|yesno:'triangle-exclamation,clock' }}"></i></span><div class="incident-main"><strong>INC-{{ incident.numero_incident|stringformat:"04d" }} · {{ incident.typologie }}</strong><span>{{ incident.description|truncatechars:70 }}</span></div><div class="incident-meta"><span class="status-label status-{{ incident.statut }}">{{ incident.get_statut_display }}</span><small>{{ incident.arret_minutes }} min d’arrêt</small></div></div>
+{% empty %}<p class="empty">Aucun incident ne correspond à ce filtre.</p>{% endfor %}
+</div>

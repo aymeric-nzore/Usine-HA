@@ -1,0 +1,76 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Usine HA{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="min-h-screen">
+  <div class="app-shell">
+    <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="sidebar-backdrop"></div>
+    <aside class="sidebar">
+      <a href="{% url 'dashboard' %}" class="brand">
+        <span class="brand-mark"><i class="fa-solid fa-industry"></i></span>
+        <span><strong>Usine</strong><small>{{ atelier.numero|default:"HA" }} / opérations</small></span>
+      </a>
+      <p class="nav-label">Pilotage</p>
+      <nav class="space-y-1">
+        <a class="nav-link active" href="{% url 'dashboard' %}"><i class="fa-solid fa-table-cells"></i> Vue d’ensemble</a>
+        {% if perms.production.view_atelier %}<a class="nav-link" href="{% url 'atelier_list' %}"><i class="fa-solid fa-building"></i> Ateliers & lignes</a>{% endif %}
+        {% if perms.production.view_lotproduction %}<a class="nav-link" href="{% url 'production_list' %}"><i class="fa-solid fa-boxes-stacked"></i> Production</a>{% endif %}
+      </nav>
+      <p class="nav-label">Opérations</p>
+      <nav class="space-y-1">
+        {% if perms.maintenance.view_incident %}<a class="nav-link" href="{% url 'incident_list' %}"><i class="fa-solid fa-triangle-exclamation"></i> Incidents <span class="nav-count">3</span></a>{% endif %}
+        {% if perms.maintenance.view_maintenance %}<a class="nav-link" href="{% url 'maintenance_list' %}"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance</a>{% endif %}
+        {% if perms.stock.view_piece %}<a class="nav-link" href="{% url 'piece_list' %}"><i class="fa-solid fa-cubes"></i> Stocks & pièces</a>{% endif %}
+      </nav>
+      <div class="sidebar-footer">
+        <div class="lottie-slot" aria-label="Animation Lottie à fournir"><i class="fa-solid fa-wave-square"></i></div>
+        <span>Poste sécurisé<br><small>Synchronisé il y a 2 min</small></span>
+        <i class="fa-solid fa-circle-check status-ok"></i>
+      </div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumb"><span>{{ atelier.libelle|default:"Usine HA" }}</span><i class="fa-solid fa-chevron-right"></i><strong>Vue d’ensemble</strong></div>
+        <div class="top-actions">
+          <button class="icon-button" aria-label="Rechercher"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <button class="icon-button notification" aria-label="Notifications"><i class="fa-regular fa-bell"></i><span></span></button>
+          <div class="user-chip"><span class="avatar">{{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}</span><span><b>{{ request.user.get_full_name|default:request.user.username }}</b><small>Session active</small></span></div>
+          <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button class="logout-button" type="submit" aria-label="Se déconnecter"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Déconnexion</span></button>
+          </form>
+        </div>
+      </header>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script>
+    const menuToggle = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const backdrop = document.querySelector('.sidebar-backdrop');
+    const closeMenu = () => {
+      sidebar.classList.remove('is-open');
+      backdrop.classList.remove('is-visible');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    };
+    menuToggle.addEventListener('click', () => {
+      const open = sidebar.classList.toggle('is-open');
+      backdrop.classList.toggle('is-visible', open);
+      menuToggle.setAttribute('aria-expanded', String(open));
+    });
+    backdrop.addEventListener('click', closeMenu);
+    document.querySelectorAll('.nav-link').forEach((link) => link.addEventListener('click', closeMenu));
+  </script>
+</body>
+</html>

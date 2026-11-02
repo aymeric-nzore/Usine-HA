@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Vue d’ensemble · Usine HA{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">{{ atelier.numero }} · {{ atelier.libelle }} · équipe du matin</p><h1>Bonjour {{ request.user.first_name|default:request.user.username }}, voici l’état de l’usine.</h1><p class="subtitle">Les signaux essentiels de votre atelier, réunis au même endroit.</p></div>
+  {% if perms.maintenance.add_incident %}<a class="primary-button" href="{% url 'incident_create' %}"><i class="fa-solid fa-plus"></i> Déclarer un incident</a>{% endif %}
+</section>
+<section class="stats-grid">
+  {% if perms.production.view_atelier %}<article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-building"></i></div><div><span>Ateliers actifs</span><strong>{{ stats.ateliers }}</strong><small class="trend"><i class="fa-solid fa-arrow-up"></i> 1 depuis lundi</small></div></article>{% endif %}
+  {% if perms.production.view_lotproduction %}<article class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-boxes-stacked"></i></div><div><span>Lots en production</span><strong>{{ stats.production }}</strong><small class="trend"><i class="fa-solid fa-arrow-up"></i> 8% vs. hier</small></div></article>{% endif %}
+  {% if perms.maintenance.view_machine %}<article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-gears"></i></div><div><span>Machines surveillées</span><strong>{{ stats.machines }}</strong><small class="muted">sur 24 équipements</small></div></article>{% endif %}
+  {% if perms.stock.view_piece %}<article class="stat-card"><div class="stat-icon red"><i class="fa-solid fa-box-open"></i></div><div><span>Alertes stock</span><strong>{{ stats.stock_alerts }}</strong><small class="alert-text">À traiter aujourd’hui</small></div></article>{% endif %}
+</section>
+<section class="content-grid">
+  {% if perms.maintenance.view_incident %}<article class="panel panel-wide">
+    <div class="panel-heading"><div><p class="eyebrow">Flux en direct</p><h2>Incidents récents</h2></div><a href="#" class="text-link">Tout voir <i class="fa-solid fa-arrow-right"></i></a></div>
+    <div class="filter-row" hx-get="{% url 'incident_feed' %}" hx-target="#incident-feed" hx-trigger="click">
+      <button class="filter-chip active" name="status" value="all">Tous</button><button class="filter-chip" name="status" value="ouvert">Ouverts</button><button class="filter-chip" name="status" value="en_cours">En cours</button><button class="filter-chip" name="status" value="resolu">Résolus</button>
+    </div>
+    <div id="incident-feed">{% include "core/partials/incident_feed.html" with incidents=recent_incidents %}</div>
+  </article>{% endif %}
+  {% if perms.production.view_atelier %}<article class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">Organisation</p><h2>Ateliers actifs</h2></div><a href="#" class="round-link"><i class="fa-solid fa-plus"></i></a></div>
+    <div class="atelier-list">{% for atelier in ateliers %}<div class="atelier-row"><span class="atelier-code">{{ atelier.numero }}</span><div><strong>{{ atelier.libelle }}</strong><small>{{ atelier.line_count }} lignes · {{ atelier.responsable }}</small></div><span class="live-dot"></span></div>{% empty %}<p class="empty">Aucun atelier actif.</p>{% endfor %}</div>
+  </article>{% endif %}
+</section>
+<section class="content-grid lower-grid">
+  {% if perms.maintenance.view_machine %}<article class="panel panel-wide">
+    <div class="panel-heading"><div><p class="eyebrow">Équipements</p><h2>État du parc machines</h2></div><a href="#" class="text-link">Ouvrir le parc <i class="fa-solid fa-arrow-right"></i></a></div>
+    <div class="machine-grid">{% for machine in machines %}<div class="machine-row"><span class="machine-symbol"><i class="fa-solid fa-industry"></i></span><div><strong>{{ machine.identifiant }}</strong><small>{{ machine.nom }} · {{ machine.ligne.numero }}</small></div><span class="state state-{{ machine.etat }}">{{ machine.get_etat_display }}</span></div>{% empty %}<p class="empty">Aucune machine enregistrée.</p>{% endfor %}</div>
+  </article>{% endif %}
+  {% if perms.production.view_lotproduction %}<article class="panel pulse-panel"><div class="pulse-art"><i class="fa-solid fa-chart-line"></i></div><p class="eyebrow">Production cumulée</p><strong class="big-number">{{ production_total }}</strong><span>unités planifiées sur les lots actifs</span><div class="bar"><span style="width: 72%"></span></div><small>72% de la capacité journalière</small></article>{% endif %}
+</section>
+{% endblock %}

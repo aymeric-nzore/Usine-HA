@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Ateliers & lignes · Usine HA{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">Organisation</p><h1>{{ atelier.numero }} · {{ atelier.libelle }}</h1><p class="subtitle">Lignes et équipements de votre atelier.</p></div>
+</section>
+<section class="panel page-panel">
+  <div class="panel-heading"><div><p class="eyebrow">Production</p><h2>{{ lines|length }} ligne{{ lines|length|pluralize }} active{{ lines|length|pluralize }}</h2></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Ligne</th><th>Opérateurs requis</th><th>Équipements</th><th>État</th></tr></thead><tbody>
+  {% for line in lines %}<tr><td><strong>{{ line.numero }}</strong></td><td>{{ line.operateurs_requis }}</td><td>{% for machine in line.machines.all %}{{ machine.identifiant }}{% if not forloop.last %}, {% endif %}{% empty %}Aucune machine{% endfor %}</td><td><span class="status-label status-resolu">Active</span></td></tr>{% empty %}<tr><td colspan="4" class="empty">Aucune ligne rattachée à cet atelier.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

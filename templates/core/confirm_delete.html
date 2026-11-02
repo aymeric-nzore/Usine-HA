@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Confirmer la suppression · Usine HA{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">Confirmation</p><h1>Supprimer cet élément ?</h1><p class="subtitle">Cette action est irréversible.</p></div></section>
+<section class="panel form-panel"><p>Vous êtes sur le point de supprimer <strong>{{ object }}</strong>.</p><form method="post" class="form-actions">{% csrf_token %}<a class="secondary-button" href="{% url cancel_url %}">Annuler</a><button class="danger-button" type="submit">Supprimer</button></form></section>
+{% endblock %}

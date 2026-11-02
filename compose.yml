@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: usine-ha-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: usine_ha
+      POSTGRES_USER: usine
+      POSTGRES_PASSWORD: usine_dev_password
+    ports:
+      - "55432:5432"
+    volumes:
+      - usine_ha_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usine -d usine_ha"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  usine_ha_postgres_data:

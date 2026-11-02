@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Production · Usine HA{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">{{ atelier.numero }} · Suivi des lots</p><h1>Production</h1><p class="subtitle">Lots en cours et produits suivis dans votre atelier.</p></div>
+</section>
+<section class="panel page-panel">
+  <div class="panel-heading"><div><p class="eyebrow">Lots</p><h2>{{ lots|length }} lot{{ lots|length|pluralize }}</h2></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Lot</th><th>Produit</th><th>Ligne</th><th>Quantité</th><th>Statut</th></tr></thead><tbody>
+  {% for lot in lots %}<tr><td><strong>{{ lot.numero_lot }}</strong><small>{{ lot.date_debut|date:"d/m/Y" }}</small></td><td>{{ lot.produit.designation }}</td><td>{{ lot.ligne.numero }}</td><td>{{ lot.quantite }}</td><td><span class="status-label {% if lot.statut == 'en_cours' %}status-en_cours{% elif lot.statut == 'bloque' %}status-ouvert{% else %}status-resolu{% endif %}">{{ lot.get_statut_display }}</span></td></tr>{% empty %}<tr><td colspan="5" class="empty">Aucun lot dans cet atelier.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

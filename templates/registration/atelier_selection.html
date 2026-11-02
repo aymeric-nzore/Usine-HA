@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Choisir un atelier · Usine HA</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="auth-page">
+  <main class="selection-layout">
+    <div class="selection-card">
+      <a href="{% url 'login' %}" class="brand selection-brand"><span class="brand-mark"><i class="fa-solid fa-industry"></i></span><span><strong>Usine</strong><small>HA / opérations</small></span></a>
+      <div class="selection-heading"><p class="eyebrow">Contexte de travail</p><h1>Choisissez votre atelier.</h1><p>Votre rôle et vos données seront filtrés selon cet atelier.</p></div>
+      <form method="post" class="selection-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {{ form.as_p }}
+        <button class="primary-button" type="submit">Continuer <i class="fa-solid fa-arrow-right"></i></button>
+      </form>
+      <form method="post" action="{% url 'logout' %}" class="selection-logout">{% csrf_token %}<button type="submit"><i class="fa-solid fa-arrow-left"></i> Changer de compte</button></form>
+    </div>
+  </main>
+</body>
+</html>

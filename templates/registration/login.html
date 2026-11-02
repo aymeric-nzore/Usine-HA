@@ -1,0 +1,57 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion · Usine HA</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="auth-page">
+  <main class="auth-layout">
+    <section class="auth-intro">
+      <a href="{% url 'login' %}" class="brand auth-brand">
+        <span class="brand-mark"><i class="fa-solid fa-industry"></i></span>
+        <span><strong>Usine</strong><small>HA / opérations</small></span>
+      </a>
+      <div class="auth-message">
+        <p class="eyebrow">Poste de pilotage</p>
+        <h1>Le bon signal,<br>au bon moment.</h1>
+        <p>Retrouvez l’état de vos lignes, vos équipes et vos équipements dans un espace de travail partagé.</p>
+      </div>
+      <div class="auth-visual"><i class="fa-solid fa-wave-square"></i><span>Flux usine actif</span><b></b><small>Connexion sécurisée</small></div>
+    </section>
+    <section class="auth-card-wrap">
+      <div class="auth-card">
+        <div class="auth-card-heading"><p class="eyebrow">Accès équipe</p><h2>Bon retour.</h2><p>Connectez-vous pour accéder au cockpit Usine HA.</p></div>
+        {% if form.errors %}
+          <div class="form-error" role="alert"><i class="fa-solid fa-circle-exclamation"></i> {{ form.non_field_errors|striptags|default:"Identifiant ou mot de passe incorrect." }}</div>
+        {% endif %}
+        <form method="post" class="auth-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
+          <label for="id_username">Identifiant</label>
+          <div class="input-wrap"><i class="fa-regular fa-user"></i><input id="id_username" name="username" type="text" autocomplete="username" placeholder="awa.kone" required autofocus></div>
+          <label for="id_atelier">Atelier</label>
+          <div class="input-wrap select-wrap">
+            <i class="fa-solid fa-building"></i>
+            <select id="id_atelier" name="atelier" required>
+              <option value="">Choisir votre atelier</option>
+              {% for atelier in form.atelier.field.queryset %}
+                <option value="{{ atelier.pk }}" {% if form.atelier.value == atelier.pk|stringformat:"s" %}selected{% endif %}>{{ atelier.numero }} — {{ atelier.libelle }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% if form.atelier.errors %}<p class="field-error">{{ form.atelier.errors|striptags }}</p>{% endif %}
+          <label for="id_password">Mot de passe</label>
+          <div class="input-wrap"><i class="fa-solid fa-lock"></i><input id="id_password" name="password" type="password" autocomplete="current-password" placeholder="Votre mot de passe" required><button type="button" class="toggle-password" aria-label="Afficher le mot de passe" onclick="const input=document.getElementById('id_password'); input.type=input.type==='password'?'text':'password'; this.querySelector('i').classList.toggle('fa-eye-slash'); this.querySelector('i').classList.toggle('fa-eye');"><i class="fa-regular fa-eye"></i></button></div>
+          <button type="submit" class="primary-button auth-submit">Ouvrir ma session <i class="fa-solid fa-arrow-right"></i></button>
+        </form>
+        <p class="auth-help"><i class="fa-solid fa-shield-halved"></i> Accès réservé aux équipes Usine HA</p>
+      </div>
+      <small class="auth-footer">Usine HA · Système de gestion d’usine</small>
+    </section>
+  </main>
+</body>
+</html>
