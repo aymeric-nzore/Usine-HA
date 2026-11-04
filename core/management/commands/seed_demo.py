@@ -32,11 +32,16 @@ class Command(BaseCommand):
             "yannick.kouadio": "AT-02",
             "mariama.coulibaly": "AT-03",
         }
+        matricule_counter = 1
         for username, atelier_id in profile_ateliers.items():
             UserProfile.objects.update_or_create(
                 user=users[username],
-                defaults={"atelier_id": atelier_id},
+                defaults={
+                    "atelier_id": atelier_id,
+                    "matricule": f"UsineHA-{matricule_counter:04d}",
+                },
             )
+            matricule_counter += 1
 
         lignes = [
             ("L-101", "AT-01", 4),
