@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
 from maintenance.models import Incident, Maintenance, MaintenancePiece
-from production.models import Atelier
+from production.models import Atelier, Produit
 from stock.models import Piece
 
 
@@ -126,8 +126,17 @@ class MaintenanceForm(forms.ModelForm):
     def save(self, commit=True):
         maintenance = super().save(commit=commit)
         if commit:
-            # Mettre à jour les pièces liées (supprimer les anciennes, recréer les nouvelles)
             maintenance.maintenance_pieces.all().delete()
             for piece in self.cleaned_data.get("pieces_utilisees", []):
                 MaintenancePiece.objects.create(maintenance=maintenance, piece=piece, quantite=1)
         return maintenance
+
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Produit
+        fields = ("reference", "designation", "prix_unitaire", "quantite_stock")
+        widgets = {
+            "reference": forms.TextInput(attrs={"placeholder": "ex: PRD-AX14"}),
+            "designation": forms.TextInput(attrs={"placeholder": "Désignation du produit"}),
+        }

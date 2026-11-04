@@ -21,6 +21,7 @@ from .forms import (
     IncidentForm,
     MaintenanceForm,
     PieceForm,
+    ProductForm,
     TeamLoginForm,
     available_ateliers,
 )
@@ -333,3 +334,54 @@ def maintenance_delete(request, maintenance_id):
         messages.success(request, "L’intervention de maintenance a été supprimée.")
         return redirect("maintenance_list")
     return render(request, "core/confirm_delete.html", {"object": maintenance, "cancel_url": "maintenance_list"})
+
+
+@operational_required
+@permission_required("production.view_produit", raise_exception=True)
+def product_list(request):
+    atelier = selected_atelier(request)
+    produits = Produit.objects.all().order_by("reference")
+    return render(request, "core/product_list.html", {
+        "atelier": atelier,
+        "produits": produits,
+    })
+
+
+@operational_required
+@permission_required("production.add_produit", raise_exception=True)
+def product_create(request):
+    form = ProductForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Le produit a été créé.")
+        return redirect("product_list")
+    return render(request, "core/product_form.html", {
+        "form": form,
+        "title": "Ajouter un produit",
+    })
+
+
+@operational_required
+@permission_required("production.change_produit", raise_exception=True)
+def product_update(request, reference):
+    produit = get_object_or_404(Produit, reference=reference)
+    form = ProductForm(request.POST or None, instance=produit)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Le produit a été mis à jour.")
+        return redirect("product_list")
+    return render(request, "core/product_form.html", {
+        "form": form,
+        "title": f"Modifier {produit.reference}",
+    })
+
+
+@operational_required
+@permission_required("production.delete_produit", raise_exception=True)
+def product_delete(request, reference):
+    produit = get_object_or_404(Produit, reference=reference)
+    if request.method == "POST":
+        produit.delete()
+        messages.success(request, "Le produit a été supprimé.")
+        return redirect("product_list")
+    return render(request, "core/confirm_delete.html", {"object": produit, "cancel_url": "product_list"})

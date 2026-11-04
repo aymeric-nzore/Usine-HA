@@ -27,6 +27,7 @@
         {% if perms.production.view_atelier %}<a class="nav-link" href="{% url 'atelier_list' %}"><i class="fa-solid fa-building"></i> Ateliers & lignes</a>{% endif %}
         {% if perms.production.view_lotproduction %}<a class="nav-link" href="{% url 'production_list' %}"><i class="fa-solid fa-boxes-stacked"></i> Production</a>{% endif %}
         {% if perms.production.view_lotproduction %}<a class="nav-link" href="{% url 'stats_production' %}"><i class="fa-solid fa-chart-line"></i> Statistiques production</a>{% endif %}
+        {% if perms.production.view_produit %}<a class="nav-link" href="{% url 'product_list' %}"><i class="fa-solid fa-box"></i> Produits</a>{% endif %}
       </nav>
       <p class="nav-label">Opérations</p>
       <nav class="space-y-1">
@@ -47,6 +48,7 @@
           <button class="icon-button" aria-label="Rechercher"><i class="fa-solid fa-magnifying-glass"></i></button>
           <button class="icon-button notification" aria-label="Notifications"><i class="fa-regular fa-bell"></i><span></span></button>
           <div class="user-chip"><span class="avatar">{{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}</span><span><b>{{ request.user.get_full_name|default:request.user.username }}</b><small>Session active</small></span></div>
+          <a class="icon-button" href="{% url 'password_change' %}" aria-label="Modifier le mot de passe"><i class="fa-solid fa-key"></i></a>
           <form method="post" action="{% url 'logout' %}" class="logout-form">
             {% csrf_token %}
             <button class="logout-button" type="submit" aria-label="Se déconnecter"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Déconnexion</span></button>

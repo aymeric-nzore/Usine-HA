@@ -34,6 +34,10 @@ urlpatterns = [
     path('pieces/nouvelle/', views.piece_create, name='piece_create'),
     path('pieces/<str:reference>/modifier/', views.piece_update, name='piece_update'),
     path('pieces/<str:reference>/supprimer/', views.piece_delete, name='piece_delete'),
+    path('produits/', views.product_list, name='product_list'),
+    path('produits/nouveau/', views.product_create, name='product_create'),
+    path('produits/<str:reference>/modifier/', views.product_update, name='product_update'),
+    path('produits/<str:reference>/supprimer/', views.product_delete, name='product_delete'),
     path('maintenance/', views.maintenance_list, name='maintenance_list'),
     path('maintenance/nouvelle/', views.maintenance_create, name='maintenance_create'),
     path('maintenance/<int:maintenance_id>/modifier/', views.maintenance_update, name='maintenance_update'),
@@ -41,4 +45,5 @@ urlpatterns = [
     path('connexion/', views.TeamLoginView.as_view(), name='login'),
     path('ateliers/selection/', views.atelier_selection, name='atelier_selection'),
     path('deconnexion/', views.logout_view, name='logout'),
+    path('mot-de-passe/modifier/', auth_views.PasswordChangeView.as_view(template_name='registration/password_change.html'), name='password_change'),
 ]

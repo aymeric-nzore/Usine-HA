@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Produits · Usine HA{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">{{ atelier.numero }} · {{ atelier.libelle }} · Catalogue</p>
+    <h1>Produits</h1>
+    <p class="subtitle">Gérer le catalogue des produits de l’atelier.</p>
+  </div>
+  {% if perms.production.add_produit %}<a class="primary-button" href="{% url 'product_create' %}"><i class="fa-solid fa-plus"></i> Ajouter un produit</a>{% endif %}
+</section>
+{% if messages %}{% for message in messages %}<div class="flash-message">{{ message }}</div>{% endfor %}{% endif %}
+<section class="panel page-panel">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Référence</th>
+          <th>Désignation</th>
+          <th>Prix unitaire</th>
+          <th>Stock</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for produit in produits %}
+        <tr>
+          <td><strong>{{ produit.reference }}</strong></td>
+          <td>{{ produit.designation }}</td>
+          <td>{{ produit.prix_unitaire }} €</td>
+          <td>{{ produit.quantite_stock }}</td>
+          <td class="table-actions">
+            {% if perms.production.change_produit %}<a href="{% url 'product_update' produit.reference %}" aria-label="Modifier"><i class="fa-solid fa-pen"></i></a>{% endif %}
+            {% if perms.production.delete_produit %}<a href="{% url 'product_delete' produit.reference %}" aria-label="Supprimer"><i class="fa-solid fa-trash"></i></a>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="empty">Aucun produit enregistré.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
