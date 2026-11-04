@@ -31,8 +31,8 @@
         <form method="post" class="auth-form">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.GET.next }}">
-          <label for="id_username">Identifiant</label>
-          <div class="input-wrap"><i class="fa-regular fa-user"></i><input id="id_username" name="username" type="text" autocomplete="username" placeholder="awa.kone" required autofocus></div>
+          <label for="id_username">Matricule</label>
+          <div class="input-wrap"><i class="fa-solid fa-id-card"></i><input id="id_username" name="username" type="text" autocomplete="username" placeholder="UsineHA-0001" required autofocus></div>
           <label for="id_atelier">Atelier</label>
           <div class="input-wrap select-wrap">
             <i class="fa-solid fa-building"></i>
@@ -55,3 +55,5 @@
   </main>
 </body>
 </html>
+
+

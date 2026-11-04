@@ -12,6 +12,13 @@ class UserProfile(models.Model):
         related_name="profile",
         on_delete=models.CASCADE,
     )
+    matricule = models.CharField(
+        max_length=30,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Matricule employé (généré automatiquement, préfixe UsineHA-).",
+    )
     atelier = models.ForeignKey(
         Atelier,
         related_name="membres",

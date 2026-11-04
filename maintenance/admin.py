@@ -2,7 +2,13 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
-from .models import Incident, Machine, Maintenance
+from .models import Incident, Machine, Maintenance, MaintenancePiece
+
+
+class MaintenancePieceInline(admin.TabularInline):
+    model = MaintenancePiece
+    extra = 0
+    autocomplete_fields = ("piece",)
 
 
 @admin.register(Machine)
@@ -23,3 +29,13 @@ class IncidentAdmin(admin.ModelAdmin):
 class MaintenanceAdmin(admin.ModelAdmin):
     list_display = ("machine", "description", "debut", "duree_minutes", "preventive")
     list_filter = ("preventive", "machine")
+    search_fields = ("machine__identifiant", "machine__nom", "description")
+    inlines = (MaintenancePieceInline,)
+
+
+@admin.register(MaintenancePiece)
+class MaintenancePieceAdmin(admin.ModelAdmin):
+    list_display = ("maintenance", "piece", "quantite")
+    list_filter = ("maintenance", "piece")
+    search_fields = ("piece__reference", "piece__libelle")
+    autocomplete_fields = ("maintenance", "piece")

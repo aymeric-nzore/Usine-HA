@@ -140,6 +140,11 @@ LOGOUT_REDIRECT_URL = '/connexion/'
 LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'Europe/Paris'
 
+AUTHENTICATION_BACKENDS = [
+    "users.backends.MatriculeBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

@@ -1,5 +1,6 @@
 from django.db import models
 from production.models import LigneProduction, LotProduction
+from stock.models import Piece
 
 
 class Machine(models.Model):
@@ -41,5 +42,32 @@ class Maintenance(models.Model):
 
     class Meta:
         ordering = ["-debut"]
+
+    def pieces_utilisees(self):
+        """Retourne les pièces utilisées avec leur quantité pour cette maintenance."""
+        return self.maintenance_pieces.select_related("piece").all()
+
+
+class MaintenancePiece(models.Model):
+    """Pièce consommée lors d'une intervention de maintenance."""
+    maintenance = models.ForeignKey(
+        Maintenance,
+        related_name="maintenance_pieces",
+        on_delete=models.CASCADE,
+    )
+    piece = models.ForeignKey(
+        Piece,
+        related_name="utilisee_dans_maintenances",
+        on_delete=models.PROTECT,
+    )
+    quantite = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        unique_together = ("maintenance", "piece")
+        verbose_name = "pièce utilisée"
+        verbose_name_plural = "pièces utilisées"
+
+    def __str__(self):
+        return f"{self.piece.reference} × {self.quantite} (maintenance {self.maintenance.pk})"
 
 # Create your models here.

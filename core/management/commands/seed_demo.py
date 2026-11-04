@@ -211,3 +211,4 @@ class Command(BaseCommand):
                 )
             )
         return permissions
+

@@ -24,6 +24,7 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('ateliers/', views.atelier_list, name='atelier_list'),
     path('production/', views.production_list, name='production_list'),
+    path('production/statistiques/', views.stats_production, name='stats_production'),
     path('incidents/', views.incident_list, name='incident_list'),
     path('incidents/nouveau/', views.incident_create, name='incident_create'),
     path('incidents/<int:incident_id>/modifier/', views.incident_update, name='incident_update'),

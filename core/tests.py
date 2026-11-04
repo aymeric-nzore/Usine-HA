@@ -26,7 +26,8 @@ class AuthenticationFlowTests(TestCase):
             responsable=self.user,
         )
         self.user.profile.atelier = self.atelier
-        self.user.profile.save(update_fields=("atelier",))
+        self.user.profile.matricule = "UsineHA-0001"
+        self.user.profile.save(update_fields=("atelier", "matricule"))
 
     def test_dashboard_requires_login(self):
         response = self.client.get(reverse("dashboard"))
@@ -36,13 +37,13 @@ class AuthenticationFlowTests(TestCase):
         response = self.client.get(reverse("login"))
         self.assertContains(response, 'id="id_atelier"')
         self.assertContains(response, "AT-AUTH")
-        self.assertContains(response, "awa.kone")
+        self.assertContains(response, "Matricule")
 
     def test_user_can_login_and_logout(self):
         response = self.client.post(
             reverse("login"),
             {
-                "username": "m.curie",
+                "username": "UsineHA-0001",
                 "password": "secure-test-password",
                 "atelier": self.atelier.pk,
             },
@@ -69,7 +70,7 @@ class AuthenticationFlowTests(TestCase):
     def test_login_requires_an_atelier_belonging_to_user(self):
         response = self.client.post(
             reverse("login"),
-            {"username": "m.curie", "password": "secure-test-password"},
+            {"username": "UsineHA-0001", "password": "secure-test-password"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Sélectionnez votre atelier")
@@ -77,7 +78,7 @@ class AuthenticationFlowTests(TestCase):
         response = self.client.post(
             reverse("login"),
             {
-                "username": "m.curie",
+                "username": "UsineHA-0001",
                 "password": "secure-test-password",
                 "atelier": self.atelier.pk,
             },
@@ -226,3 +227,6 @@ class AuthenticationFlowTests(TestCase):
         response = self.client.get("/admin/users/equipe/add/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Créer un collaborateur responsable")
+
+
+

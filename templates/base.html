@@ -26,6 +26,7 @@
         <a class="nav-link active" href="{% url 'dashboard' %}"><i class="fa-solid fa-table-cells"></i> Vue d’ensemble</a>
         {% if perms.production.view_atelier %}<a class="nav-link" href="{% url 'atelier_list' %}"><i class="fa-solid fa-building"></i> Ateliers & lignes</a>{% endif %}
         {% if perms.production.view_lotproduction %}<a class="nav-link" href="{% url 'production_list' %}"><i class="fa-solid fa-boxes-stacked"></i> Production</a>{% endif %}
+        {% if perms.production.view_lotproduction %}<a class="nav-link" href="{% url 'stats_production' %}"><i class="fa-solid fa-chart-line"></i> Statistiques production</a>{% endif %}
       </nav>
       <p class="nav-label">Opérations</p>
       <nav class="space-y-1">

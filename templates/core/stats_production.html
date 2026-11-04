@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Statistiques de production · Usine HA{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">{{ atelier.numero }} · {{ atelier.libelle }} · Responsable d'atelier</p>
+    <h1>Statistiques de production</h1>
+    <p class="subtitle">Vue d'ensemble des lots, lignes, produits et équipements de votre atelier.</p>
+  </div>
+</section>
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <div class="stat-icon blue"><i class="fa-solid fa-boxes-stacked"></i></div>
+    <div>
+      <span>Lots totaux</span>
+      <strong>{{ total_lots }}</strong>
+      <small class="trend"><i class="fa-solid fa-arrow-up"></i> {{ lots_en_cours }} en cours · {{ lots_termines }} terminés · {{ lots_bloques }} bloqués</small>
+    </div>
+  </article>
+  <article class="stat-card">
+    <div class="stat-icon green"><i class="fa-solid fa-hashtag"></i></div>
+    <div>
+      <span>Unités produites</span>
+      <strong>{{ quantite_totale }}</strong>
+      <small class="muted">sur tous les lots de l'atelier</small>
+    </div>
+  </article>
+  <article class="stat-card">
+    <div class="stat-icon yellow"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <div>
+      <span>Incidents</span>
+      <strong>{{ total_incidents }}</strong>
+      <small class="alert-text">{{ arret_total_minutes }} min d'arrêt total</small>
+    </div>
+  </article>
+  <article class="stat-card">
+    <div class="stat-icon red"><i class="fa-solid fa-gears"></i></div>
+    <div>
+      <span>Machines</span>
+      <strong>{{ machines_total }}</strong>
+      <small class="muted">{{ machines_maintenance }} en maintenance · {{ machines_arret }} à l'arrêt</small>
+    </div>
+  </article>
+</section>
+
+<section class="content-grid">
+  <article class="panel panel-wide">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Par ligne de production</p>
+        <h2>Répartition par ligne</h2>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Ligne</th><th>Nombre de lots</th><th>Quantité</th></tr>
+        </thead>
+        <tbody>
+          {% for row in production_par_ligne %}
+          <tr>
+            <td><strong>{{ row.ligne__numero }}</strong></td>
+            <td>{{ row.nb_lots }}</td>
+            <td>{{ row.qte }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="empty">Aucune donnée de production.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="panel panel-wide">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Par produit</p>
+        <h2>Répartition par produit</h2>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Produit</th><th>Référence</th><th>Nombre de lots</th><th>Quantité</th></tr>
+        </thead>
+        <tbody>
+          {% for row in production_par_produit %}
+          <tr>
+            <td><strong>{{ row.produit__designation }}</strong></td>
+            <td>{{ row.produit__reference }}</td>
+            <td>{{ row.nb_lots }}</td>
+            <td>{{ row.qte }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="empty">Aucune donnée de production.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
+{% endblock %}

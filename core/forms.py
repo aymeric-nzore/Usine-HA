@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
-from maintenance.models import Incident, Maintenance
+from maintenance.models import Incident, Maintenance, MaintenancePiece
 from production.models import Atelier
 from stock.models import Piece
 
@@ -14,6 +14,11 @@ def available_ateliers(user):
 
 
 class TeamLoginForm(AuthenticationForm):
+    username = forms.CharField(
+        label="Matricule",
+        max_length=30,
+        widget=forms.TextInput(attrs={"autocomplete": "username", "placeholder": "UsineHA-0001"}),
+    )
     atelier = forms.ModelChoiceField(
         label="Atelier",
         queryset=Atelier.objects.filter(actif=True),
@@ -90,9 +95,17 @@ class PieceForm(forms.ModelForm):
 
 
 class MaintenanceForm(forms.ModelForm):
+    pieces_utilisees = forms.ModelMultipleChoiceField(
+        label="Pièces utilisées",
+        queryset=Piece.objects.none(),
+        required=False,
+        help_text="Sélectionnez les pièces consommées lors de cette intervention.",
+        widget=forms.SelectMultiple(attrs={"size": 5}),
+    )
+
     class Meta:
         model = Maintenance
-        fields = ("machine", "description", "debut", "duree_minutes", "preventive")
+        fields = ("machine", "description", "debut", "duree_minutes", "preventive", "pieces_utilisees")
         widgets = {
             "debut": forms.DateTimeInput(
                 attrs={"type": "datetime-local"},
@@ -105,4 +118,16 @@ class MaintenanceForm(forms.ModelForm):
         self.fields["machine"].queryset = self.fields["machine"].queryset.filter(
             ligne__atelier=atelier
         )
+        self.fields["pieces_utilisees"].queryset = Piece.objects.filter(atelier=atelier).order_by("reference")
         self.fields["debut"].input_formats = ["%Y-%m-%dT%H:%M"]
+        if self.instance and self.instance.pk:
+            self.fields["pieces_utilisees"].initial = self.instance.maintenance_pieces.values_list("piece", flat=True)
+
+    def save(self, commit=True):
+        maintenance = super().save(commit=commit)
+        if commit:
+            # Mettre à jour les pièces liées (supprimer les anciennes, recréer les nouvelles)
+            maintenance.maintenance_pieces.all().delete()
+            for piece in self.cleaned_data.get("pieces_utilisees", []):
+                MaintenancePiece.objects.create(maintenance=maintenance, piece=piece, quantite=1)
+        return maintenance

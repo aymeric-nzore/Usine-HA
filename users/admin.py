@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.contrib.auth.models import Group
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.db import models
 from production.models import Atelier
 
 from .models import Equipe, Operateur, UserProfile
@@ -24,7 +25,8 @@ class UserProfileInline(admin.StackedInline):
     extra = 0
     can_delete = False
     autocomplete_fields = ("atelier",)
-    fields = ("atelier",)
+    fields = ("matricule", "atelier")
+    readonly_fields = ("matricule",)
 
 
 class AdminUserCreationForm(UserCreationForm):
@@ -129,15 +131,19 @@ class UsineUserAdmin(UserAdmin):
             ),
         }),
     )
-    list_display = ("username", "get_full_name", "role", "atelier", "is_active", "is_staff")
+    list_display = ("username", "matricule", "get_full_name", "role", "atelier", "is_active", "is_staff")
     list_filter = ("groups", "is_active", "is_staff")
-    search_fields = ("username", "first_name", "last_name", "email")
+    search_fields = ("username", "matricule", "first_name", "last_name", "email")
     filter_horizontal = ("groups", "user_permissions")
     inlines = (UserProfileInline,)
 
     @admin.display(description="Atelier", ordering="profile__atelier")
     def atelier(self, user):
         return getattr(user.profile, "atelier", None) or ("—" if user.is_staff else "À définir")
+
+    @admin.display(description="Matricule", ordering="profile__matricule")
+    def matricule(self, user):
+        return getattr(user.profile, "matricule", None) or "—"
 
     @admin.display(description="Rôle", ordering="groups__name")
     def role(self, user):
@@ -161,9 +167,25 @@ class UsineUserAdmin(UserAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         profile, _ = UserProfile.objects.get_or_create(user=obj)
+        if not profile.matricule:
+            profile.matricule = self._next_matricule()
+            profile.save(update_fields=("matricule",))
         if "atelier" in form.cleaned_data:
             profile.atelier = form.cleaned_data["atelier"]
             profile.save(update_fields=("atelier",))
+
+    @staticmethod
+    def _next_matricule():
+        from django.db.models import Max
+        from django.db.models.functions import Cast, Substr, Length
+
+        last = (
+            UserProfile.objects.filter(matricule__startswith="UsineHA-")
+            .aggregate(max_num=Max(Cast(Substr("matricule", 9), output_field=models.IntegerField())))
+            .get("max_num")
+        )
+        next_num = (last or 0) + 1
+        return f"UsineHA-{next_num:04d}"
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)

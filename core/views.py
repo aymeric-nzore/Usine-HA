@@ -142,6 +142,61 @@ def production_list(request):
 
 
 @operational_required
+@permission_required("production.view_lotproduction", raise_exception=True)
+def stats_production(request):
+    """Statistiques de production pour le responsable d'atelier."""
+    atelier = selected_atelier(request)
+    lots = LotProduction.objects.filter(ligne__atelier=atelier).select_related("produit", "ligne")
+
+    total_lots = lots.count()
+    lots_en_cours = lots.filter(statut="en_cours").count()
+    lots_termines = lots.filter(statut="termine").count()
+    lots_bloques = lots.filter(statut="bloque").count()
+    quantite_totale = lots.aggregate(total=Sum("quantite")).get("total") or 0
+
+    # Production par ligne
+    production_par_ligne = (
+        lots.values("ligne__numero")
+        .annotate(nb_lots=Count("numero_lot"), qte=Sum("quantite"))
+        .order_by("ligne__numero")
+    )
+
+    # Production par produit
+    production_par_produit = (
+        lots.values("produit__reference", "produit__designation")
+        .annotate(nb_lots=Count("numero_lot"), qte=Sum("quantite"))
+        .order_by("-qte")
+    )
+
+    # Incidents et temps d'arrêt
+    incidents = Incident.objects.filter(lot__ligne__atelier=atelier).select_related("lot")
+    total_incidents = incidents.count()
+    arret_total_minutes = incidents.aggregate(total=Sum("arret_minutes")).get("total") or 0
+
+    # Machines en maintenance ou arrêt
+    machines = Machine.objects.filter(ligne__atelier=atelier)
+    machines_maintenance = machines.filter(etat="maintenance").count()
+    machines_arret = machines.filter(etat="arret").count()
+
+    context = {
+        "atelier": atelier,
+        "total_lots": total_lots,
+        "lots_en_cours": lots_en_cours,
+        "lots_termines": lots_termines,
+        "lots_bloques": lots_bloques,
+        "quantite_totale": quantite_totale,
+        "production_par_ligne": production_par_ligne,
+        "production_par_produit": production_par_produit,
+        "total_incidents": total_incidents,
+        "arret_total_minutes": arret_total_minutes,
+        "machines_maintenance": machines_maintenance,
+        "machines_arret": machines_arret,
+        "machines_total": machines.count(),
+    }
+    return render(request, "core/stats_production.html", context)
+
+
+@operational_required
 @permission_required("maintenance.view_incident", raise_exception=True)
 def incident_feed(request):
     atelier = selected_atelier(request)
